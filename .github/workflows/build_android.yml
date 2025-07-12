@@ -31,6 +31,14 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle') }}
 
+- name: Set Flutter properties in local.properties
+  run: |
+    echo "flutter.sdk=$FLUTTER_HOME" >> android/local.properties
+    echo "flutter.versionCode=2" >> android/local.properties
+    echo "flutter.versionName=1.0.1" >> android/local.properties
+  env:
+    FLUTTER_HOME: ${{ github.workspace }}/flutter
+
       - name: Build APKs
         id: build
         working-directory: android  #android为子目录路径，需修改为您需要的路径
