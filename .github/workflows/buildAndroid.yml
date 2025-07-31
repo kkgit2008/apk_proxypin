@@ -36,8 +36,14 @@ jobs:
       - name: Configure Flutter SDK path
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
-          echo "flutter.sdk=$FLUTTER_HOME" > local.properties
+          echo "flutter.sdk=${{ github.workspace }}/flutter" > local.properties
           cat local.properties
+
+      - name: Debug Flutter SDK path
+        run: |
+          echo "FLUTTER_HOME: $FLUTTER_HOME"
+          echo "ff/packages/flutter_tools/gradle:"
+          ls -la $FLUTTER_HOME/packages/flutter_tools/gradle
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
