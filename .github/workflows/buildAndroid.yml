@@ -42,8 +42,9 @@ jobs:
       # 验证环境
       - name: Check versions
         run: |
-          flutter --version | grep -E 'Dart SDK version: 3.[5-9]' || exit 1
-          which flutter
+          flutter --version
+          dart --version
+          exit 1
 
       # 彻底清理并初始化
       - name: Reset project
