@@ -1,4 +1,4 @@
-qname: Android Build with SHA256
+name: Android Build with SHA256
 
 ##To build from subfolder,just modify the 'ANDROID_DIR'
 
