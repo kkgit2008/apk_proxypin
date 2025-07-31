@@ -1,4 +1,4 @@
-name: Android Build with SHA256
+qname: Android Build with SHA256
 
 ##To build from subfolder,just modify the 'ANDROID_DIR'
 
@@ -43,9 +43,9 @@ jobs:
         run: |
           echo "FLUTTER_ROOT: $FLUTTER_ROOT"
           echo "flutter.sdk/packages:"
-          ls $FLUTTER_ROOT/packages
+          ls -la $FLUTTER_ROOT/packages
           echo "dart version:"
-          ls $FLUTTER_ROOT/bin/cache/dart-sdk/version
+          ls -la $FLUTTER_ROOT/bin/cache/dart-sdk/version
 
       # 彻底清理并初始化
       - name: Reset project
@@ -55,11 +55,7 @@ jobs:
           flutter clean
           rm -rf .dart_tool pubspec.lock
           # 生成 .dart_tool/package_config.json 文件
-          flutter pub get || {
-            echo "::warning::依赖解析失败，尝试降级 flutter_lints...";
-            sed -i 's/flutter_lints: \^5.0.0/flutter_lints: ^4.0.0/' pubspec.yaml;
-            flutter pub get;
-          }
+          flutter pub get
 
       # 验证环境
       - name: Check versions
