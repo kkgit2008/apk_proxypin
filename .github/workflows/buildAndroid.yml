@@ -39,19 +39,22 @@ jobs:
           channel: 'stable'
           cache: false
 
+      # 彻底清理并初始化
+      - name: Reset project
+        # 确保在项目根目录执行
+        working-directory: .
+        run: |
+          flutter clean
+          rm -rf .dart_tool pubspec.lock
+          # 生成 .dart_tool/package_config.json 文件
+          flutter pub get
+
       # 验证环境
       - name: Check versions
         run: |
           flutter --version
           dart --version
           exit 1
-
-      # 彻底清理并初始化
-      - name: Reset project
-        run: |
-          flutter clean
-          rm -rf .dart_tool pubspec.lock
-          flutter pub get
 
       # 新增：生成 local.properties 并设置 flutter.sdk
       - name: Configure Flutter SDK path
@@ -94,13 +97,6 @@ jobs:
         run: |
           if [ ! -f "gradlew" ]; then gradle wrapper; fi
           chmod +x gradlew
-
-
-      - name: Get Flutter dependencies
-        # 确保在项目根目录执行
-        working-directory: .
-        # 生成 .dart_tool/package_config.json 文件
-        run: flutter pub get
 
       - name: Setup Flutter plugins
         run: |
