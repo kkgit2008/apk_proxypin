@@ -42,11 +42,11 @@ jobs:
       - name: Debug Flutter SDK path
         run: |
           echo "FLUTTER_ROOT: $FLUTTER_ROOT"
-          echo "ff/packages:"
+          echo "flutter.sdk/packages:"
           ls -la $FLUTTER_ROOT/packages
-          echo "ff/packages/flutter_tools:"
+          echo "flutter.sdk/packages/flutter_tools:"
           ls -la $FLUTTER_ROOT/packages/flutter_tools
-          echo "ff/packages/flutter_tools/gradle:"
+          echo "flutter.sdk/packages/flutter_tools/gradle:"
           ls -la $FLUTTER_ROOT/packages/flutter_tools/gradle
 
       - name: Set up JDK 17
@@ -74,6 +74,25 @@ jobs:
           if [ ! -f "gradlew" ]; then gradle wrapper; fi
           chmod +x gradlew
 
+
+      - name: Get Flutter dependencies
+        # 确保在项目根目录执行
+        working-directory: .
+        run: flutter pub get
+
+      - name: Setup Flutter plugins
+        run: |
+          # 示例：确保基础插件存在
+          flutter pub add flutter_localizations --sdk=flutter
+          flutter pub upgrade
+
+      - name: Prepare Flutter
+        run: |
+          flutter doctor -v
+          flutter config --enable-android
+          flutter precache --android
+
+
       - name: Build Debug
         working-directory: ${{ env.ANDROID_DIR }}
         run: ./gradlew assembleDebug
@@ -98,3 +117,8 @@ jobs:
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/debug/*.sha256
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.apk
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.sha256
+
+      - name: Clean workspace
+        run: |
+          flutter clean
+          cd android && ./gradlew clean
