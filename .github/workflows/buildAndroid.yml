@@ -68,10 +68,6 @@ jobs:
           echo "FLUTTER_ROOT: $FLUTTER_ROOT"
           echo "flutter.sdk/packages:"
           ls -la $FLUTTER_ROOT/packages
-          echo "flutter.sdk/packages/flutter_tools:"
-          ls -la $FLUTTER_ROOT/packages/flutter_tools
-          echo "flutter.sdk/packages/flutter_tools/gradle:"
-          ls -la $FLUTTER_ROOT/packages/flutter_tools/gradle
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
