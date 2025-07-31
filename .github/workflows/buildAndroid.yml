@@ -35,9 +35,22 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.5'
+          flutter-version: '3.22.1'
           channel: 'stable'
-          cache: true
+          cache: false
+
+      # 验证环境
+      - name: Check versions
+        run: |
+          flutter --version | grep -E 'Dart SDK version: 3.[5-9]' || exit 1
+          which flutter
+
+      # 彻底清理并初始化
+      - name: Reset project
+        run: |
+          flutter clean
+          rm -rf .dart_tool pubspec.lock
+          flutter pub get
 
       # 新增：生成 local.properties 并设置 flutter.sdk
       - name: Configure Flutter SDK path
@@ -82,17 +95,10 @@ jobs:
           chmod +x gradlew
 
 
-      - name: Check Dart version
-        run: |
-          flutter --version
-          dart --version
-        env:
-          # 确保路径正确
-          FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.19.5-x64
-
       - name: Get Flutter dependencies
         # 确保在项目根目录执行
         working-directory: .
+        # 生成 .dart_tool/package_config.json 文件
         run: flutter pub get
 
       - name: Setup Flutter plugins
@@ -133,7 +139,7 @@ jobs:
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.apk
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.sha256
 
-      - name: Clean workspace
-        run: |
-          flutter clean
-          cd android && ./gradlew clean
+#      - name: Clean workspace
+#        run: |
+#          flutter clean
+#          cd android && ./gradlew clean
