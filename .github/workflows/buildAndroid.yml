@@ -15,7 +15,12 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build_apk:
+    strategy:
+      matrix:
+        # build_type: ['debug', 'release']
+        build_type: ['debug']
+    name: Build APK
     runs-on: ubuntu-latest
     steps:
 
@@ -119,30 +124,26 @@ jobs:
           flutter precache --android
 
 
-      - name: Build Debug
+      - name: Build ${{ matrix.build_type }} APK
         working-directory: ${{ env.ANDROID_DIR }}
-        run: ./gradlew assembleDebug
+        run: |
+          build_type=${{ matrix.build_type }}
+          ./gradlew assemble${build_type^}
 
-      - name: Build Release
-        working-directory: ${{ env.ANDROID_DIR }}
-        run: ./gradlew assembleRelease
-
-      - name: Show file paths
+      - name: Show apk paths
         run: |
             echo ">>./build/app/outputs/apk:"
             ls -la ./build/app/outputs/apk
             echo ">>./build/app/outputs/flutter-apk:"
             ls -la ./build/app/outputs/flutter-apk
 
-      - name: Upload debug apk
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug
-          path: ./build/app/outputs/flutter-apk/app-debug.apk
+      - name: Copy ${{ matrix.build_type }} APK
+        run: |
+          cp ./build/app/outputs/flutter-apk/*.apk ./
 
-      - name: Upload release apk
+      - name: Upload ${{ matrix.build_type }} APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: ./build/app/outputs/flutter-apk/app-release.apk
+          name: apk-${{ matrix.build_type }}
+          path: app-${{ matrix.build_type }}.apk
 
