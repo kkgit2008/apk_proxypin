@@ -18,8 +18,7 @@ jobs:
   build_apk:
     strategy:
       matrix:
-        # build_type: ['debug', 'release']
-        build_type: ['debug']
+        build_type: ['debug', 'release']
     name: Build APK
     runs-on: ubuntu-latest
     steps:
@@ -79,8 +78,7 @@ jobs:
             ~/.android/build-cache
             ~/.android/cache
             ~/Android/Sdk/ndk
-            key: Linux-ndk-1e280dec6a6cd35da8ca29066820b68282ac63f0dd82802807445fd0f2dbe473
-            # key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
+          key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
 
       - name: Cache CMake
         uses: actions/cache@v3
@@ -88,10 +86,8 @@ jobs:
           path: |
             ~/.gradle/caches/**/cmake-*
             ~/Android/Sdk/cmake
-          key: Linux-cmake-e0a7d050c0b37e5180b2a75ca397264d8c7375aa624be79886584117acb0a02f
-          restore-keys: Linux-cmake-
-          # key: ${{ runner.os }}-cmake-${{ hashFiles('**/build.gradle', '**/CMakeLists.txt') }}
-          # restore-keys: ${{ runner.os }}-cmake-
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/build.gradle', '**/CMakeLists.txt') }}
+          restore-keys: ${{ runner.os }}-cmake-
 
       - name: Increase Gradle memory
         working-directory: ${{ env.ANDROID_DIR }}
