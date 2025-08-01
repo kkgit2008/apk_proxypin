@@ -71,24 +71,6 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle') }}
 
-      - name: Cache NDK
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.android/build-cache
-            ~/.android/cache
-            ~/Android/Sdk/ndk
-          key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
-
-      - name: Cache CMake
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches/**/cmake-*
-            ~/Android/Sdk/cmake
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/build.gradle', '**/CMakeLists.txt') }}
-          restore-keys: ${{ runner.os }}-cmake-
-
       - name: Increase Gradle memory
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
