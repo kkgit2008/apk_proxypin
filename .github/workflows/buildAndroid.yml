@@ -121,6 +121,7 @@ jobs:
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
           find . -name '*.apk' | while read apk; do
+            ls -la $apk
             sha256sum "$apk" > "${apk}.sha256"
           done
 
