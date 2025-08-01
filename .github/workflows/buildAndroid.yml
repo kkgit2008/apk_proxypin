@@ -59,8 +59,8 @@ jobs:
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
           # 将sdk路径写入文件
-          # echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
-          echo -e "flutter.sdk=$FLUTTER_ROOT\nsdk.dir=$ANDROID_HOME" > local.properties
+          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          # echo -e "flutter.sdk=$FLUTTER_ROOT\nsdk.dir=$ANDROID_HOME" > local.properties
           # 打印文件内容
           cat local.properties
 
