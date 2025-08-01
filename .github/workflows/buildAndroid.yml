@@ -31,7 +31,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0'
+          flutter-version: '3.29.0@35c388afb57ef061d06a39b537336c87e0e3d1b1'
+          # 固定提交哈希，确保缓存true生效
           channel: 'stable'
           cache: true
 
@@ -107,14 +108,6 @@ jobs:
           # 升级所有依赖包到最新兼容版本
           flutter pub upgrade || exit 1
 
-      - name: Cache Flutter packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ env.FLUTTER_ROOT }}/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock', '**/pubspec.yaml') }}
-
       - name: Prepare Flutter
         run: |
           # 详细检查Flutter开发环境状态
@@ -134,27 +127,24 @@ jobs:
 #        run: ./gradlew assembleRelease
 
       - name: Generate SHA256 checksums
-        working-directory: ${{ env.ANDROID_DIR }}
+        # working-directory: ${{ env.ANDROID_DIR }}
         run: |
-          find . -name '*.apk' | while read apk; do
-            ls -la $apk
+          find ./build/app/outputs -name '*.apk' | while read apk; do
+          # 递归查找该目录下所有 .apk 文件，并逐行读取 find 命令的输出（即每个 .apk 文件的路径）
             sha256sum "$apk" > "${apk}.sha256"
+            # 计算当前 .apk 文件的 SHA256 哈希值，并写入同名但扩展名为 .sha256 的文件
           done
 
       - name: Show file paths
         run: |
-            echo ">>root:"
-            ls -la
-            echo ">>build:"
-            ls -la ./build
-            echo ">>app:"
-            ls -la ./build/app
-            echo ">>outputs:"
+            echo ">>./build/app/outputs:"
             ls -la ./build/app/outputs
-            echo ">>apk:"
-            ls -la ./build/app/outputs/apk
-            echo ">>debug:"
+            echo ">>./build/app/outputs/apk/debug:"
             ls -la ./build/app/outputs/apk/debug
+            echo ">>./build/app/outputs/flutter-apk:"
+            ls -la ./build/app/outputs/flutter-apk
+            echo ">>./build/app/outputs/flutter-apk/debug:"
+            ls -la ./build/app/outputs/flutter-apk/debug
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
