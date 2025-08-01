@@ -1,7 +1,5 @@
 name: Android Build with SHA256
 
-##To build from subfolder,just modify the 'ANDROID_DIR'
-
 on:
   push:
     #branches: [ "main","master","dev","release" ]
@@ -29,7 +27,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 设置 Flutter 环境
+#      # 设置 Flutter 环境
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -37,16 +35,16 @@ jobs:
           channel: 'stable'
           cache: true
 
-      # 彻底清理并初始化
+#      # 彻底清理并初始化
       - name: Reset project
-        # 确保在项目根目录执行
+#        # 确保在项目根目录执行
 #        working-directory: .
         run: |
 #          flutter clean
 #          rm -rf .dart_tool pubspec.lock
           echo ">>clean finished"
 
-      # 生成 local.properties 并设置 flutter.sdk
+#      # 生成 local.properties 并设置 flutter.sdk
       - name: Configure Flutter SDK path
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
