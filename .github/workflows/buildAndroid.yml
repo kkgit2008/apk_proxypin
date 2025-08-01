@@ -6,7 +6,7 @@ on:
   push:
     #branches: [ "main","master","dev","release" ]
     ##Start build only on these branches
-  workflow_dispatch:{}
+  workflow_dispatch: {}
   ##Support manual build in 'Actions/workflow'
 
 env:
@@ -36,14 +36,6 @@ jobs:
           flutter-version: '3.29.0'
           channel: 'stable'
           cache: true
-
-      - name: Cache Flutter packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ env.FLUTTER_ROOT }}/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock', '**/pubspec.yaml') }}
 
       # 彻底清理并初始化
       - name: Reset project
@@ -107,6 +99,14 @@ jobs:
           flutter pub add flutter_localizations --sdk=flutter || exit 1
           # 升级所有依赖包到最新兼容版本
           flutter pub upgrade || exit 1
+
+      - name: Cache Flutter packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.FLUTTER_ROOT }}/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock', '**/pubspec.yaml') }}
 
       - name: Prepare Flutter
         run: |
