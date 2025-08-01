@@ -76,6 +76,16 @@ jobs:
             ~/Android/Sdk/ndk
           key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
 
+      - name: Cache CMake
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches/**/cmake-*
+            ~/Android/Sdk/cmake
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/build.gradle', '**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-cmake-
+
       - name: Increase Gradle memory
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
@@ -88,7 +98,7 @@ jobs:
           chmod +x gradlew
 
 
-      - name: Setup Flutter & Flutter plugins
+      - name: Setup Flutter plugins
         run: |
           # 获取所有依赖项并生成'.dart_tool/package_config.json'文件
           flutter pub get || exit 1
@@ -137,12 +147,14 @@ jobs:
             ls -la
             echo ">>build:"
             ls -la ./build
+            echo ">>app:"
+            ls -la ./build/app
             echo ">>outputs:"
-            ls -la ./build/outputs
+            ls -la ./build/app/outputs
             echo ">>apk:"
-            ls -la ./build/outputs/apk
+            ls -la ./build/app/outputs/apk
             echo ">>debug:"
-            ls -la ./build/outputs/apk/debug
+            ls -la ./build/app/outputs/apk/debug
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
