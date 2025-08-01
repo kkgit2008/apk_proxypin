@@ -31,8 +31,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0@35c388afb57ef061d06a39b537336c87e0e3d1b1'
-          # 固定提交哈希，确保缓存true生效
+          flutter-version: '3.29.0'
           channel: 'stable'
           cache: true
 
