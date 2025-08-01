@@ -74,7 +74,8 @@ jobs:
             ~/.android/build-cache
             ~/.android/cache
             ~/Android/Sdk/ndk
-          key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
+            key: Linux-ndk-1e280dec6a6cd35da8ca29066820b68282ac63f0dd82802807445fd0f2dbe473
+            # key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
 
       - name: Cache CMake
         uses: actions/cache@v3
@@ -82,9 +83,10 @@ jobs:
           path: |
             ~/.gradle/caches/**/cmake-*
             ~/Android/Sdk/cmake
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/build.gradle', '**/CMakeLists.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-
+          key: Linux-cmake-e0a7d050c0b37e5180b2a75ca397264d8c7375aa624be79886584117acb0a02f
+          restore-keys: Linux-cmake-
+          # key: ${{ runner.os }}-cmake-${{ hashFiles('**/build.gradle', '**/CMakeLists.txt') }}
+          # restore-keys: ${{ runner.os }}-cmake-
 
       - name: Increase Gradle memory
         working-directory: ${{ env.ANDROID_DIR }}
@@ -125,15 +127,6 @@ jobs:
         working-directory: ${{ env.ANDROID_DIR }}
         run: ./gradlew assembleRelease
 
-      - name: Generate SHA256 checksums
-        # working-directory: ${{ env.ANDROID_DIR }}
-        run: |
-          find ./build/app/outputs -name '*.apk' | while read apk; do
-          # 递归查找该目录下所有 .apk 文件，并逐行读取 find 命令的输出（即每个 .apk 文件的路径）
-            sha256sum "$apk" > "${apk}.sha256"
-            # 计算当前 .apk 文件的 SHA256 哈希值，并写入同名但扩展名为 .sha256 的文件
-          done
-
       - name: Show file paths
         run: |
             echo ">>./build/app/outputs/apk:"
@@ -141,11 +134,15 @@ jobs:
             echo ">>./build/app/outputs/flutter-apk:"
             ls -la ./build/app/outputs/flutter-apk
 
-      - name: Upload artifacts
+      - name: Upload debug apk
         uses: actions/upload-artifact@v4
         with:
-          name: myapk
-          path: |
-            ./build/app/outputs/flutter-apk/*.apk
-            ./build/app/outputs/flutter-apk/*.sha256
+          name: app-debug
+          path: ./build/app/outputs/flutter-apk/app-debug.apk
+
+      - name: Upload release apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: ./build/app/outputs/flutter-apk/app-release.apk
 
