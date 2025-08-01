@@ -6,12 +6,10 @@ on:
   push:
     #branches: [ "main","master","dev","release" ]
     ##Start build only on these branches
-  workflow_dispatch:
+  workflow_dispatch:{}
   ##Support manual build in 'Actions/workflow'
 
 env:
-  #ANDROID_DIR: .
-  ##Build from root project(when 'app' folder is just at root)
   ANDROID_DIR: android
   ##Build from 'android' folder(when 'app' folder is in 'root/android' folder), modify it as you need.
 
@@ -31,44 +29,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 新增：设置 Flutter 环境
+      # 设置 Flutter 环境
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.29.0'
           channel: 'stable'
-          cache: false
+          cache: true
 
-      - name: Debug Flutter SDK path
-        run: |
-          echo "FLUTTER_ROOT: $FLUTTER_ROOT"
-          echo "flutter.sdk/packages:"
-          ls -la $FLUTTER_ROOT/packages
-          echo "dart version:"
-          ls -la $FLUTTER_ROOT/bin/cache/dart-sdk/version
+      - name: Cache Flutter packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.FLUTTER_ROOT }}/.pub-cache
+            .dart_tool
+               - name: Cache Flutter packages
+       uses: actions/cache@v3
+       with:
+         path: |
+           ${{ env.FLUTTER_ROOT }}/.pub-cache
+           .dart_tool
+         key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock', '**/pubspec.yaml') }}
 
       # 彻底清理并初始化
       - name: Reset project
         # 确保在项目根目录执行
-        working-directory: .
+#        working-directory: .
         run: |
-          flutter clean
-          rm -rf .dart_tool pubspec.lock
-          # 生成 .dart_tool/package_config.json 文件
-          flutter pub get
+#          flutter clean
+#          rm -rf .dart_tool pubspec.lock
+          echo ">>clean finished"
 
-      # 验证环境
-      - name: Check versions
-        run: |
-          flutter --version
-          dart --version
-#          exit 1
-
-      # 新增：生成 local.properties 并设置 flutter.sdk
+      # 生成 local.properties 并设置 flutter.sdk
       - name: Configure Flutter SDK path
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
-          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          # 将sdk路径写入文件
+          # echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          echo -e "flutter.sdk=$FLUTTER_ROOT\nsdk.dir=$ANDROID_HOME" > local.properties
+          # 打印文件内容
           cat local.properties
 
       - name: Set up JDK 17
@@ -85,10 +84,19 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle') }}
 
-#      - name: Increase Gradle memory
-#        working-directory: ${{ env.ANDROID_DIR }}
-#        run: |
-#          printf "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g\n" >> gradle.properties
+      - name: Cache NDK
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.android/build-cache
+            ~/.android/cache
+            ~/Android/Sdk/ndk
+          key: ${{ runner.os }}-ndk-${{ hashFiles('**/gradle-wrapper.properties', '**/build.gradle', '**/app/build.gradle', '**/gradle.properties') }}
+
+      - name: Increase Gradle memory
+        working-directory: ${{ env.ANDROID_DIR }}
+        run: |
+          printf "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g\n" >> gradle.properties
 
       - name: Make gradlew executable
         working-directory: ${{ env.ANDROID_DIR }}
@@ -96,26 +104,33 @@ jobs:
           if [ ! -f "gradlew" ]; then gradle wrapper; fi
           chmod +x gradlew
 
-      - name: Setup Flutter plugins
+
+      - name: Setup Flutter & Flutter plugins
         run: |
-          # 示例：确保基础插件存在
-          flutter pub add flutter_localizations --sdk=flutter
-          flutter pub upgrade
+          # 获取所有依赖项并生成'.dart_tool/package_config.json'文件
+          flutter pub get || exit 1
+          # 添加Flutter官方提供的国际化语言支持库
+          flutter pub add flutter_localizations --sdk=flutter || exit 1
+          # 升级所有依赖包到最新兼容版本
+          flutter pub upgrade || exit 1
 
       - name: Prepare Flutter
         run: |
+          # 详细检查Flutter开发环境状态
           flutter doctor -v
+          # 显式启用Android平台支持，防止出现未知问题
           flutter config --enable-android
+          # 预下载Android平台所需的二进制文件和工具链，减少后续构建时间
           flutter precache --android
 
 
-#      - name: Build Debug
-#        working-directory: ${{ env.ANDROID_DIR }}
-#        run: ./gradlew assembleDebug
-
-      - name: Build Release
+      - name: Build Debug
         working-directory: ${{ env.ANDROID_DIR }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
+
+#      - name: Build Release
+#        working-directory: ${{ env.ANDROID_DIR }}
+#        run: ./gradlew assembleRelease
 
       - name: Generate SHA256 checksums
         working-directory: ${{ env.ANDROID_DIR }}
@@ -125,6 +140,15 @@ jobs:
             sha256sum "$apk" > "${apk}.sha256"
           done
 
+      - name: Show file paths
+        run: |
+            echo ">>outputs:"
+            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/
+            echo ">>apk:"
+            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/apk/
+            echo ">>debug:"
+            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/apk/debug/
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -132,10 +156,6 @@ jobs:
           path: |
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/debug/*.apk
             ${{ env.ANDROID_DIR }}/app/build/outputs/apk/debug/*.sha256
-            ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.apk
-            ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.sha256
+#            ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.apk
+#            ${{ env.ANDROID_DIR }}/app/build/outputs/apk/release/*.sha256
 
-#      - name: Clean workspace
-#        run: |
-#          flutter clean
-#          cd android && ./gradlew clean
