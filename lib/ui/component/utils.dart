@@ -19,7 +19,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:proxypin/l10n/app_localizations.dart';
 import 'package:flutter_toastr/flutter_toastr.dart';
 import 'package:proxypin/network/http/content_type.dart';
 import 'package:proxypin/network/http/http.dart';
@@ -70,6 +70,21 @@ String getPackage(int? size) {
     return "${(size / 1024 / 1024).toStringAsFixed(2)} MB";
   }
   return "${(size / 1024).toStringAsFixed(2)} KB";
+}
+
+String copyRawRequest(HttpRequest request) {
+  var sb = StringBuffer();
+  var uri = request.requestUri!;
+  var pathAndQuery = uri.path + (uri.query.isNotEmpty ? '?${uri.query}' : '');
+
+
+  sb.writeln("${request.method.name} $pathAndQuery ${request.protocolVersion}");
+  sb.write(request.headers.headerLines());
+  if (request.bodyAsString.isNotEmpty) {
+    sb.writeln();
+    sb.write(request.bodyAsString);
+  }
+  return sb.toString();
 }
 
 String copyRequest(HttpRequest request, HttpResponse? response) {

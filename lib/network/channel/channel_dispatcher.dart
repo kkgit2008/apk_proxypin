@@ -80,11 +80,11 @@ class ChannelDispatcher extends ChannelHandler<Uint8List> {
 
   @override
   Future<void> channelRead(ChannelContext channelContext, Channel channel, Uint8List msg) async {
-    try {
-      //手机扫码连接转发远程
-      HostAndPort? remote = channelContext.getAttribute(AttributeKeys.remote);
-      buffer.add(msg);
+    //手机扫码连接转发远程
+    HostAndPort? remote = channelContext.getAttribute(AttributeKeys.remote);
+    buffer.add(msg);
 
+    try {
       if (remote != null) {
         await remoteForward(channelContext, remote);
         return;
@@ -137,7 +137,7 @@ class ChannelDispatcher extends ChannelHandler<Uint8List> {
 
       if (data is HttpRequest) {
         channelContext.currentRequest = data;
-        data.hostAndPort = channelContext.host ?? getHostAndPort(data, ssl: channel.isSsl);
+        data.hostAndPort ??= channelContext.host ?? getHostAndPort(data, ssl: channel.isSsl);
         if (data.headers.host != null && data.headers.host?.contains(":") == false) {
           data.hostAndPort?.host = data.headers.host!;
         }
@@ -168,7 +168,7 @@ class ChannelDispatcher extends ChannelHandler<Uint8List> {
     }
   }
 
-  onError(ChannelContext channelContext, Channel channel, dynamic error, {StackTrace? trace}) {
+  void onError(ChannelContext channelContext, Channel channel, dynamic error, {StackTrace? trace}) {
     logger.e(
         "[${channelContext.clientChannel?.id}] channelRead error isSsl:${channel.isSsl} client: ${channelContext.clientChannel?.selectedProtocol} server: ${channelContext.serverChannel?.selectedProtocol} ${String.fromCharCodes(buffer.bytes)}",
         error: error,
