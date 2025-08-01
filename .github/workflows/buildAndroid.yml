@@ -43,13 +43,7 @@ jobs:
           path: |
             ${{ env.FLUTTER_ROOT }}/.pub-cache
             .dart_tool
-               - name: Cache Flutter packages
-       uses: actions/cache@v3
-       with:
-         path: |
-           ${{ env.FLUTTER_ROOT }}/.pub-cache
-           .dart_tool
-         key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock', '**/pubspec.yaml') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock', '**/pubspec.yaml') }}
 
       # 彻底清理并初始化
       - name: Reset project
