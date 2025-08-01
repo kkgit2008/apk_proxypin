@@ -109,9 +109,9 @@ jobs:
           flutter precache --android
 
 
-      - name: Build Debug
-        working-directory: ${{ env.ANDROID_DIR }}
-        run: ./gradlew assembleDebug
+#      - name: Build Debug
+#        working-directory: ${{ env.ANDROID_DIR }}
+#        run: ./gradlew assembleDebug
 
       - name: Build Release
         working-directory: ${{ env.ANDROID_DIR }}
