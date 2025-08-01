@@ -62,7 +62,7 @@ jobs:
         run: |
           flutter --version
           dart --version
-          exit 1
+#          exit 1
 
       # 新增：生成 local.properties 并设置 flutter.sdk
       - name: Configure Flutter SDK path
