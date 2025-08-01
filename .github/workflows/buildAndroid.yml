@@ -133,12 +133,16 @@ jobs:
 
       - name: Show file paths
         run: |
+            echo ">>app:"
+            ls -la ${{ env.ANDROID_DIR }}/app
+            echo ">>build:"
+            ls -la ${{ env.ANDROID_DIR }}/app/build
             echo ">>outputs:"
-            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/
+            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs
             echo ">>apk:"
-            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/apk/
+            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/apk
             echo ">>debug:"
-            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/apk/debug/
+            ls -la ${{ env.ANDROID_DIR }}/app/build/outputs/apk/debug
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
