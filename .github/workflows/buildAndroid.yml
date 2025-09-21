@@ -1,7 +1,7 @@
 name: Android Build with SHA256
 
 on:
-  push:
+  # push:
     #branches: [ "main","master","dev","release" ]
     ##Start build only on these branches
   workflow_dispatch: {}
