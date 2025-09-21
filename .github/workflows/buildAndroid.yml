@@ -38,16 +38,16 @@ jobs:
         with:
           flutter-version: '3.32.8'
           channel: 'stable'
-          cache: false
+          cache: true
 
-      # 彻底清理并初始化
-      - name: Reset project
-        # 确保在项目根目录执行
-        working-directory: .
-        run: |
-          flutter clean
-          rm -rf .dart_tool pubspec.lock
-          echo ">>clean finished"
+#      # 彻底清理并初始化
+#      - name: Reset project
+#        # 确保在项目根目录执行
+#        working-directory: .
+#        run: |
+#          flutter clean
+#          rm -rf .dart_tool pubspec.lock
+#          echo ">>clean finished"
 
 #      # 生成 local.properties 并设置 flutter.sdk
       - name: Configure Flutter SDK path
