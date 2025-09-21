@@ -38,7 +38,7 @@ jobs:
         with:
           flutter-version: '3.32.8'
           channel: 'stable'
-          cache: true
+          cache: false
 
 #      # 彻底清理并初始化
 #      - name: Reset project
